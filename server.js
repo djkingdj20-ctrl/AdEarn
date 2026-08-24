@@ -1,115 +1,61 @@
-const express=require("express");
-const session=require("express-session");
-const fs=require("fs");
-const path=require("path");
-const crypto=require("crypto");
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
-const app=express();
-app.set("trust proxy",1);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-const PORT=Number(process.env.PORT)||10000;
-const DATA_DIR=path.join(__dirname,"data");
-const DB_FILE=path.join(DATA_DIR,"database.json");
+app.use(cors());
+app.use(bodyParser.json());
 
-if(!fs.existsSync(DATA_DIR))fs.mkdirSync(DATA_DIR,{recursive:true});
-
-function defaultDB(){
-return{
-users:[
-{
-id:"demo-user",
-name:"Rahul Sharma",
-email:"rahul.sharma@example.com",
-password:"demo123",
-mobile:"+91 98765 43210",
-city:"Vizag",
-role:"Member",
-balance:0,
-points:0,
-referralCode:"AE2F85A827",
-referredBy:null,
-successfulReferrals:0,
-referralEarnings:0,
-tasksCompleted:0,
-createdAt:new Date().toISOString()
-}
-],
-ads:[
-{
-id:1,
-title:"TechNova Cloud",
-description:"Supercharge your workflow with AI-powered cloud tools.",
-reward:1,
-image:"https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80"
-},
-{
-id:2,
-title:"PayPulse UPI",
-description:"Instant cashback and secure digital payments across India.",
-reward:1,
-image:"https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80"
-},
-{
-id:3,
-title:"ZestFit Wearables",
-description:"Track your fitness and daily activity with smart technology.",
-reward:1,
-image:"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80"
-},
-{
-id:4,
-title:"GreenLeaf Organic Mart",
-description:"Fresh farm produce delivered directly to your doorstep.",
-reward:1,
-image:"https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80"
-}
-],
-history:[],
-withdrawals:[],
-otps:[]
+// మాక్ డేటాబేస్ (డెమో కొరకు)
+let userDB = {
+    email: "rahul.sharma@example.com",
+    fullName: "Rahul Sharma",
+    mobile: "+91 98765 43210",
+    city: "Vizag",
+    balance: 1.00,
+    upiId: "rahul@okaxis"
 };
-}
 
-function loadDB(){
-try{
-if(fs.existsSync(DB_FILE)){
-return JSON.parse(fs.readFileSync(DB_FILE,"utf8"));
-}
-}catch(e){}
-return defaultDB();
-}
+// 1. గెట్ యూజర్ ప్రొఫైల్
+app.get('/api/profile', (req, res) => {
+    res.json({ success: true, data: userDB });
+});
 
-let db=loadDB();
+// 2. అప్‌డేట్ ప్రొఫైల్
+app.post('/api/profile/update', (req, res) => {
+    const { fullName, mobile, city } = req.body;
+    if (fullName) userDB.fullName = fullName;
+    if (mobile) userDB.mobile = mobile;
+    if (city) userDB.city = city;
 
-function saveDB(){
-fs.writeFileSync(DB_FILE,JSON.stringify(db,null,2));
-}
+    res.json({ success: true, message: "Profile updated successfully", data: userDB });
+});
 
-app.use(express.json({limit:"1mb"}));
-app.use(express.urlencoded({extended:true}));
+// 3. యాడ్ చూసినప్పుడు బ్యాలెన్స్ యాడ్ చేయడం (Task Completion)
+app.post('/api/task/complete', (req, res) => {
+    userDB.balance += 1.00;
+    res.json({ success: true, newBalance: userDB.balance, message: "₹1.00 added to your wallet!" });
+});
 
-app.use(session({
-secret:process.env.SESSION_SECRET||"adearn-session-secret-change-this",
-resave:false,
-saveUninitialized:false,
-cookie:{
-httpOnly:true,
-sameSite:"lax",
-secure:process.env.NODE_ENV==="production",
-maxAge:1000*60*60*24*30
-}
-}));
+// 4. విత్‌డ్రాయల్ రిక్వెస్ట్
+app.post('/api/wallet/withdraw', (req, res) => {
+    const { amount, upiId } = req.body;
+    if (amount < 100) {
+        return res.status(400).json({ success: false, message: "Minimum limit is ₹100" });
+    }
+    if (userDB.balance < amount) {
+        return res.status(400).json({ success: false, message: "Insufficient balance" });
+    }
 
-app.use(express.static(path.join(__dirname,"public")));
+    userDB.balance -= Number(amount);
+    res.json({ success: true, message: `Successfully withdrawn ₹${amount} via Cashfree Payouts`, remainingBalance: userDB.balance });
+});
 
-function getUser(req){
-return db.users.find(u=>String(u.id)===String(req.session.userId));
-}
-
-function requireLogin(req,res,next){
-const u=getUser(req);
-if(!u)return res.status(401).json({error:"Please login first."});
-req.user=u;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 next();
 }
 
