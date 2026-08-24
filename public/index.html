@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f8f9fa; color: #111827; }
-        .container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; padding-bottom: 70px; }
+        body { background-color: #f8f9fa; color: #111827; padding-bottom: 70px; }
+        .container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; }
         .auth-screen, .app-screen { display: none; padding: 20px; }
         .auth-screen.active, .app-screen.active { display: block; }
         
-        /* Auth Styles */
         .auth-logo { text-align: center; margin: 40px 0 20px 0; }
         .auth-logo span { background: #00a86b; color: white; padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 22px; }
         .auth-logo h2 { margin-top: 10px; font-size: 22px; }
@@ -24,7 +23,6 @@
         .switch-auth { text-align: center; margin-top: 15px; font-size: 13px; color: #6b7280; }
         .switch-auth span { color: #00a86b; font-weight: 600; cursor: pointer; }
 
-        /* App Header & Nav */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #ffffff; border-bottom: 1px solid #e5e7eb; }
         .logo { background: #00a86b; color: white; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 14px; }
         .balance-badge { background: #e6f4ea; border: 1px solid #ceead6; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #137333; }
@@ -36,7 +34,7 @@
         .section-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
         .section-desc { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
 
-        nav.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 999; max-width: 480px; }
+        nav.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px 0; z-index: 999; }
         .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 500; cursor: pointer; }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
         .nav-item.active { color: #00a86b; }
@@ -45,7 +43,6 @@
 <body>
 
 <div class="container">
-
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="auth-screen active">
         <div class="auth-logo">
@@ -64,32 +61,6 @@
         <div class="switch-auth">Don't have an account? <span onclick="showScreen('registerScreen')">Register</span></div>
     </div>
 
-    <!-- REGISTER SCREEN -->
-    <div id="registerScreen" class="auth-screen">
-        <div class="auth-logo">
-            <span>AE</span>
-            <h2>Create AdEarn Account</h2>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Full Name</label>
-            <input type="text" id="regName" class="form-control" placeholder="Enter full name">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" id="regEmail" class="form-control" placeholder="Enter email">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Password</label>
-            <input type="password" id="regPassword" class="form-control" placeholder="Create password">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Mobile Number</label>
-            <input type="text" id="regMobile" class="form-control" placeholder="+91 ...">
-        </div>
-        <button class="btn-primary" onclick="handleRegister()">Register</button>
-        <div class="switch-auth">Already have an account? <span onclick="showScreen('loginScreen')">Login</span></div>
-    </div>
-
     <!-- MAIN APP INTERFACE -->
     <div id="mainApp" class="app-screen">
         <header>
@@ -103,13 +74,136 @@
             </div>
         </header>
 
-        <!-- TASKS / HOME TAB -->
+        <!-- TASKS TAB -->
         <div id="tab-tasks" class="page active">
             <h2 class="section-title">Task & Ad Player</h2>
-            <p class="section-desc">Watch ads and earn money directly to your balance.</p>
+            <p class="section-desc">Watch as many ads as you want. Each successful view pays ₹1.00.</p>
             <div class="card" style="text-align: center;">
                 <div style="width: 50px; height: 50px; background: #e6f4ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
                     <i class="fa-solid fa-check" style="color: #00a86b; font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; margin-bottom: 6px;">Ready for the Next Ad?</h3>
+                <p style="font-size: 12px; color: #6b7280; margin-bottom: 15px;">Each successful view adds ₹1.00 directly to your balance.</p>
+                <button class="btn-primary" onclick="watchAd()"><i class="fa-solid fa-play"></i> Watch Next Ad (Earn ₹1)</button>
+            </div>
+        </div>
+
+        <!-- WALLET TAB -->
+        <div id="tab-wallet" class="page">
+            <h2 class="section-title">Wallet & Payouts</h2>
+            <div class="form-group">
+                <label class="form-label">Withdrawal Method</label>
+                <select class="form-control"><option>UPI ID (Instant Transfer)</option></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Amount to Withdraw (₹)</label>
+                <input type="number" class="form-control" value="150">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Your UPI ID</label>
+                <input type="text" class="form-control" value="rahul@okaxis">
+            </div>
+            <button class="btn-primary">Withdraw via Cashfree Payouts</button>
+        </div>
+
+        <!-- REFER TAB -->
+        <div id="tab-refer" class="page">
+            <h2 class="section-title">Refer & Earn</h2>
+            <p class="section-desc">Invite friends and earn ₹10 per referral.</p>
+            <div class="card" style="background:#111827; color:white;">
+                <span style="font-size:11px; color:#9ca3af;">YOUR REFERRAL CODE</span>
+                <div style="font-size:18px; font-weight:700; margin-top:8px;">AE2F85A827</div>
+            </div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="tab-profile" class="page">
+            <h2 class="section-title">User Profile</h2>
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="profileName" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mobile Number</label>
+                <input type="text" id="profileMobile" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" id="profileCity" class="form-control">
+            </div>
+            <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+            <button class="btn-primary" style="background:#dc2626; margin-top:10px;" onclick="location.reload()">Logout</button>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bottom-nav">
+            <a class="nav-item active" onclick="switchTab('tasks', this)"><i class="fa-solid fa-house"></i>Home</a>
+            <a class="nav-item" onclick="switchTab('wallet', this)"><i class="fa-solid fa-wallet"></i>Wallet</a>
+            <a class="nav-item" onclick="switchTab('refer', this)"><i class="fa-solid fa-award"></i>Refer</a>
+            <a class="nav-item" onclick="switchTab('profile', this)"><i class="fa-solid fa-user"></i>Profile</a>
+        </nav>
+    </div>
+</div>
+
+<script>
+    function showScreen(screenId) {
+        document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function handleLogin() {
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('mainApp').classList.add('active');
+        fetchProfile();
+    }
+
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        if(element) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+        }
+    }
+
+    async function fetchProfile() {
+        const res = await fetch('/api/profile');
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('userBalance').innerText = data.data.balance.toFixed(2);
+            document.getElementById('profileName').value = data.data.fullName;
+            document.getElementById('profileMobile').value = data.data.mobile;
+            document.getElementById('profileCity').value = data.data.city;
+        }
+    }
+
+    async function watchAd() {
+        const res = await fetch('/api/task/complete', { method: 'POST' });
+        const data = await res.json();
+        if(data.success) {
+            document.getElementById('userBalance').innerText = data.newBalance.toFixed(2);
+            alert("🎉 Ad Completed! ₹1.00 added to your wallet!");
+        }
+    }
+
+    async function saveProfile() {
+        const fullName = document.getElementById('profileName').value;
+        const mobile = document.getElementById('profileMobile').value;
+        const city = document.getElementById('profileCity').value;
+
+        const res = await fetch('/api/profile/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fullName, mobile, city })
+        });
+        const data = await res.json();
+        if(data.success) {
+            alert("Profile updated successfully!");
+        }
+    }
+</script>
+</body>
+</html>
                 </div>
                 <h3 style="font-size: 18px; margin-bottom: 6px;">Ready for the Next Ad?</h3>
                 <p style="font-size: 12px; color: #6b7280; margin-bottom: 15px;">Each successful view adds ₹1.00.</p>
