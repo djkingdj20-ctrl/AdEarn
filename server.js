@@ -98,18 +98,6 @@ app.post('/api/task/complete', function(req, res) {
 app.listen(PORT, function() {
     console.log("Server is running on port " + PORT);
 });
-id:ad.id,
-title:ad.title,
-description:ad.description,
-reward:Number(ad.reward),
-image:ad.image
-}))
-});
-});
-
-function todayStart(){
-const d=new Date();
-d.setHours(0,0,0,0);
 return d.getTime();
 }
 
