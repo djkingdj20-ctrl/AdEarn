@@ -1,111 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AdEarn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdEarn - Publisher & Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #111827;
+            padding-bottom: 70px;
+        }
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            background: #00a86b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .brand-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .brand-title span {
+            font-size: 11px;
+            color: #00a86b;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .balance-badge {
+            background: #e6f4ea;
+            border: 1px solid #ceead6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #137333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .balance-badge span {
+            width: 8px;
+            height: 8px;
+            background: #137333;
+            border-radius: 50%;
+        }
+        .profile-icon {
+            width: 36px;
+            height: 36px;
+            background: #00a86b;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+        }
 
-<style>
-*{box-sizing:border-box}
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 250px;
+            display: none;
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+        .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .dropdown-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .dropdown-header p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .dropdown-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #374151;
+            text-decoration: none;
+            border-bottom: 1px solid #f9fafb;
+        }
+        .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+        .dropdown-item.logout {
+            color: #dc2626;
+        }
 
-html,body{
-margin:0;
-padding:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#f7f9fb;
-color:#11192d;
-}
+        /* Container Pages */
+        .page {
+            display: none;
+            padding: 20px;
+        }
+        .page.active {
+            display: block;
+        }
 
-body{
-padding-bottom:82px;
-}
+        /* Common Card Styles */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .section-desc {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
 
-button,input,select{
-font:inherit;
-}
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+        }
+        .form-control:focus {
+            border-color: #00a86b;
+        }
+        .form-control:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
 
-button{
-cursor:pointer;
-}
+        /* Buttons */
+        .btn-primary {
+            background: #00a86b;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-warning {
+            background: #d97706;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .home-btn {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            width: fit-content;
+        }
 
-.top{
-height:96px;
-background:#fff;
-border-bottom:1px solid #e4e9ee;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 28px;
-position:sticky;
-top:0;
-z-index:20;
-}
+        /* Wallet Specific */
+        .otp-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
 
-.brand{
-display:flex;
-align-items:center;
-gap:14px;
-}
+        /* Referral Box */
+        .ref-card {
+            background: #111827;
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .ref-code-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1f2937;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .ref-code {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .copy-btn {
+            background: #00a86b;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-.brandmark{
-width:60px;
-height:60px;
-border-radius:17px;
-background:#079b70;
-color:#fff;
-display:grid;
-place-items:center;
-font-size:27px;
-font-weight:800;
-}
+        /* Bottom Navigation */
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 999;
+        }
+        .nav-item {
+            text-align: center;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-item i {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .nav-item.active {
+            color: #00a86b;
+        }
+    </style>
+</head>
+<body>
 
-.brandname{
-font-size:28px;
-font-weight:800;
-}
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <div class="logo">AE</div>
+            <div class="brand-title">
+                <h1>AdEarn</h1>
+                <span>PUBLISHER & VIEWER</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="balance-badge">
+                <span></span> Balance: ₹<span id="userBalance">1.00</span>
+            </div>
+            <div class="profile-icon" onclick="toggleDropdown()">R</div>
+        </div>
+    </header>
 
-.publisher{
-font-size:13px;
-color:#148a6b;
-letter-spacing:1px;
-margin-top:7px;
-}
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="profileDropdown">
+        <div class="dropdown-header">
+            <h4>Rahul Sharma</h4>
+            <p>rahul.sharma@example.com</p>
+        </div>
+        <a href="#" class="dropdown-item" onclick="switchPage('profile')"><i class="fa-regular fa-user"></i> Update Profile</a>
+        <a href="#" class="dropdown-item"><i class="fa-regular fa-circle-question"></i> Contact Support</a>
+        <a href="#" class="dropdown-item"><i class="fa-regular fa-circle-info"></i> About AdEarn</a>
+        <a href="#" class="dropdown-item"><i class="fa-regular fa-shield"></i> Privacy Policy</a>
+        <a href="#" class="dropdown-item logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+    </div>
 
-.headright{
-display:flex;
-align-items:center;
-gap:20px;
-}
+    <!-- PAGE 1: HOME / TASKS (Ad Player) -->
+    <div id="page-tasks" class="page active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div>
+                <h2 class="section-title">Task & Ad Player</h2>
+                <p class="section-desc" style="margin-bottom: 0;">Watch as many ads as you want. Each successful view pays ₹1.00.</p>
+            </div>
+            <button class="home-btn" onclick="switchPage('tasks')"><i class="fa-solid fa-house"></i> Home</button>
+        </div>
 
-.balance{
-border:2px solid #b7ead9;
-background:#effcf7;
-border-radius:35px;
-padding:13px 20px;
-font-size:17px;
-color:#225d4e;
-}
+        <div class="card" style="text-align: center; position: relative;">
+            <div style="width: 60px; height: 60px; background: #e6f4ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
+                <i class="fa-solid fa-check" style="color: #00a86b; font-size: 24px;"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Ready for the Next Ad?</h3>
+            <p style="font-size: 13px; color: #6b7280; margin-bottom: 20px;">You can watch as many ads as you want. Each ad successfully viewed adds ₹1.00 directly to your balance.</p>
+            
+            <button class="btn-primary" onclick="watchAd()" style="margin-bottom: 12px;">
+                <i class="fa-solid fa-play" style="margin-right: 6px;"></i> Watch Next Ad (Earn ₹1)
+            </button>
+            <button class="home-btn" style="width: 100%; justify-content: center; background: white;" onclick="switchPage('wallet')">View Wallet</button>
+        </div>
+    </div>
 
-.dot{
-display:inline-block;
-width:11px;
-height:11px;
-border-radius:50%;
-background:#65d4b3;
-margin-right:8px;
-}
+    <!-- PAGE 2: WALLET (Withdrawal) -->
+    <div id="page-wallet" class="page">
+        <div class="form-group">
+            <select class="form-control">
+                <option>UPI ID (Instant Transfer)</option>
+            </select>
+        </div>
 
-.avatar{
-border:0;
-padding:0;
-width:68px;
-height:68px;
-border-radius:50%;
-background:#11192d;
-display:grid;
-place-items:center;
-}
+        <div class="form-group">
+            <label class="form-label">Amount to Withdraw (₹)</label>
+            <input type="number" class="form-control" value="150">
+            <span style="font-size: 11px; color: #6b7280; margin-top: 4px; display: block;">Min limit: ₹100</span>
+        </div>
 
+        <div class="form-group">
+            <label class="form-label">Your UPI ID</label>
+            <input type="text" class="form-control" value="rahul@okaxis">
+        </div>
+
+        <div class="otp-box">
+            <p style="font-size: 13px; font-weight: 600; color: #b45309; margin-bottom: 4px;">Gmail OTP required for every withdrawal</p>
+            <p style="font-size: 12px; color: #78350f; margin-bottom: 12px;">Request a fresh code before submitting this payout.</p>
+            <button class="btn-warning">Send withdrawal OTP</button>
+            <input type="text" class="form-control" placeholder="Enter 6-digit OTP">
+        </div>
+
+        <button class="btn-primary" style="background: #00a86b;">Withdraw ₹150 via Cashfree Payouts</button>
+
+        <div class="card" style="margin-top: 25px;">
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Withdrawal History</h3>
+            <p style="font-size: 12px; color: #6b7280;">Your completed payouts will appear here.</p>
+        </div>
+    </div>
+
+    <!-- PAGE 3: HISTORY -->
+    <div id="page-history" class="page">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div>
+                <h2 class="section-title">Task & Ad Submissions</h2>
+                <p class="section-desc" style="margin-bottom: 0;">History of all ad watches, verification statuses, and earned amounts.</p>
+            </div>
+            <button class="home-btn" onclick="switchPage('tasks')"><i class="fa-solid fa-house"></i> Home</button>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; border-bottom: 1px solid #f3f4f6; padding-bottom: 10px; margin-bottom: 15px;">
+                <span>SUBMISSIONS LOG</span>
+                <span>Total: 1 items</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="width: 36px; height: 36px; background: #e6f4ea; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-check" style="color: #00a86b;"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; color: #6b7280;">SUB-CD7919</span>
+                            <span style="background: #e6f4ea; color: #137333; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;">PASSED</span>
+                        </div>
+                        <h4 style="font-size: 14px; font-weight: 600;">Demo sponsored ad</h4>
+                        <span style="font-size: 11px; color: #9ca3af;">Just now</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 14px; font-weight: 700; color: #00a86b;">+₹1.00</span>
+                    <span style="font-size: 10px; color: #9ca3af; display: block;">Reward per ad</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: REFER & EARN -->
+    <div id="page-refer" class="page">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h2 class="section-title">Refer & Earn</h2>
+                <p class="section-desc">Invite friends and earn ₹10 after their first successful withdrawal.</p>
+            </div>
+            <button class="home-btn" onclick="switchPage('tasks')"><i class="fa-solid fa-house"></i> Home</button>
+        </div>
+
+        <div class="ref-card">
+            <span style="font-size: 11px; color: #9ca3af; letter-spacing: 0.5px;">YOUR REFERRAL CODE</span>
+            <div class="ref-code-box">
+                <span class="ref-code">AE2F85A827</span>
+                <button class="copy-btn">Copy code</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Successful referrals</p>
+            <h3 style="font-size: 24px; font-weight: 700;">0</h3>
+        </div>
+
+        <div class="card">
+            <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Referral earnings</p>
+            <h3 style="font-size: 24px; font-weight: 700; color: #00a86b;">₹0.00</h3>
+        </div>
+    </div>
+
+    <!-- PAGE 5: PROFILE -->
+    <div id="page-profile" class="page">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h2 class="section-title">User Profile</h2>
+                <p class="section-desc">Update your mobile number and city details. Email is locked.</p>
+            </div>
+            <button class="home-btn" onclick="switchPage('tasks')"><i class="fa-solid fa-house"></i> Home</button>
+        </div>
+
+        <div class="card" style="display: flex; gap: 15px; align-items: center;">
+            <div style="width: 50px; height: 50px; background: #00a86b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600;">R</div>
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700;">Rahul Sharma</h3>
+                <p style="font-size: 12px; color: #6b7280;">rahul.sharma@example.com</p>
+                <span style="background: #e6f4ea; color: #137333; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; display: inline-block; margin-top: 4px;">Verified Publisher Account</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Email Address (Fixed)</label>
+            <input type="email" class="form-control" value="rahul.sharma@example.com" disabled>
+            <span style="font-size: 11px; color: #9ca3af; margin-top: 4px; display: block;">Email address cannot be changed after registration.</span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" value="Rahul Sharma">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Mobile Number</label>
+            <input type="text" class="form-control" value="+91 98765 43210">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" value="Vizag">
+        </div>
+
+        <button class="btn-primary" style="background: #00a86b;">Save Changes</button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <a class="nav-item active" onclick="switchPage('tasks', this)"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item" onclick="switchPage('tasks', this)"><i class="fa-solid fa-list-check"></i>Tasks</a>
+        <a class="nav-item" onclick="switchPage('wallet', this)"><i class="fa-solid fa-wallet"></i>Wallet</a>
+        <a class="nav-item" onclick="switchPage('history', this)"><i class="fa-solid fa-clock-rotate-left"></i>History</a>
+        <a class="nav-item" onclick="switchPage('refer', this)"><i class="fa-solid fa-award"></i>Refer</a>
+        <a class="nav-item" onclick="switchPage('profile', this)"><i class="fa-solid fa-user"></i>Profile</a>
+    </nav>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let balance = 1.00;
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            document.getElementById('profileDropdown').style.display = 'none';
+
+            if(element) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
+
+        function watchAd() {
+            balance += 1.00;
+            document.getElementById('userBalance').innerText = balance.toFixed(2);
+            alert("🎉 Ad Completed! ₹1.00 added to your wallet!");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.profile-icon') && !event.target.closest('.dropdown-menu')) {
+                document.getElementById('profileDropdown').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
 .avatar span{
 width:52px;
 height:52px;
