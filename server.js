@@ -10,7 +10,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// మాక్ డేటాబేస్
 var users = [
     { 
         email: "rahul.sharma@example.com", 
@@ -25,12 +24,11 @@ var users = [
 
 var currentUser = users[0];
 
-// లాగిన్ ఏపీఐ
 app.post('/api/login', function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
-    
     var user = null;
+    
     for(var i = 0; i < users.length; i++) {
         if(users[i].email === email && users[i].password === password) {
             user = users[i];
@@ -46,15 +44,14 @@ app.post('/api/login', function(req, res) {
     }
 });
 
-// రిజిస్ట్రేషన్ ఏపీఐ
 app.post('/api/register', function(req, res) {
     var fullName = req.body.fullName;
     var email = req.body.email;
     var password = req.body.password;
     var mobile = req.body.mobile;
     var city = req.body.city;
-
     var exists = false;
+
     for(var i = 0; i < users.length; i++) {
         if(users[i].email === email) {
             exists = true;
@@ -81,12 +78,10 @@ app.post('/api/register', function(req, res) {
     res.json({ success: true, message: "Registration successful", user: newUser });
 });
 
-// గెట్ ప్రొఫైల్
 app.get('/api/profile', function(req, res) {
     res.json({ success: true, data: currentUser });
 });
 
-// అప్‌డేట్ ప్రొఫైల్
 app.post('/api/profile/update', function(req, res) {
     if (req.body.fullName) currentUser.fullName = req.body.fullName;
     if (req.body.mobile) currentUser.mobile = req.body.mobile;
@@ -95,7 +90,6 @@ app.post('/api/profile/update', function(req, res) {
     res.json({ success: true, message: "Profile updated", data: currentUser });
 });
 
-// యాడ్ కంప్లీట్ (బ్యాలెన్స్ యాడ్)
 app.post('/api/task/complete', function(req, res) {
     currentUser.balance += 1.00;
     res.json({ success: true, newBalance: currentUser.balance });
@@ -104,12 +98,6 @@ app.post('/api/task/complete', function(req, res) {
 app.listen(PORT, function() {
     console.log("Server is running on port " + PORT);
 });
-res.json({success:true,user:publicUser(u)});
-});
-
-app.get("/api/tasks",requireLogin,(req,res)=>{
-res.json({
-tasks:db.ads.map(ad=>({
 id:ad.id,
 title:ad.title,
 description:ad.description,
