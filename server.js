@@ -1,115 +1,109 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+var express = require('express');
+var cors = require('cors');
+var bodyParser = require('body-parser');
+var path = require('path');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+var app = express();
+var PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// మాక్ డేటాబేస్ (యూజర్స్ & బ్యాలెన్స్)
-let users = [
-    { email: "rahul.sharma@example.com", password: "password123", fullName: "Rahul Sharma", mobile: "+91 98765 43210", city: "Vizag", balance: 1.00, upiId: "rahul@okaxis" }
+// మాక్ డేటాబేస్
+var users = [
+    { 
+        email: "rahul.sharma@example.com", 
+        password: "password123", 
+        fullName: "Rahul Sharma", 
+        mobile: "+91 98765 43210", 
+        city: "Vizag", 
+        balance: 1.00, 
+        upiId: "rahul@okaxis" 
+    }
 ];
 
-let currentUser = users[0]; // డిఫాల్ట్ లాగిన్ యూజర్
+var currentUser = users[0];
 
 // లాగిన్ ఏపీఐ
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email && u.password === password);
+app.post('/api/login', function(req, res) {
+    var email = req.body.email;
+    var password = req.body.password;
+    
+    var user = null;
+    for(var i = 0; i < users.length; i++) {
+        if(users[i].email === email && users[i].password === password) {
+            user = users[i];
+            break;
+        }
+    }
+
     if (user) {
         currentUser = user;
-        res.json({ success: true, message: "Login successful", user });
+        res.json({ success: true, message: "Login successful", user: user });
     } else {
         res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 });
 
 // రిజిస్ట్రేషన్ ఏపీఐ
-app.post('/api/register', (req, res) => {
-    const { fullName, email, password, mobile, city } = req.body;
-    if (users.some(u => u.email === email)) {
+app.post('/api/register', function(req, res) {
+    var fullName = req.body.fullName;
+    var email = req.body.email;
+    var password = req.body.password;
+    var mobile = req.body.mobile;
+    var city = req.body.city;
+
+    var exists = false;
+    for(var i = 0; i < users.length; i++) {
+        if(users[i].email === email) {
+            exists = true;
+            break;
+        }
+    }
+
+    if (exists) {
         return res.status(400).json({ success: false, message: "Email already registered" });
     }
-    const newUser = { fullName, email, password, mobile, city, balance: 0.00, upiId: "" };
+
+    var newUser = { 
+        fullName: fullName, 
+        email: email, 
+        password: password, 
+        mobile: mobile, 
+        city: city, 
+        balance: 0.00, 
+        upiId: "" 
+    };
+    
     users.push(newUser);
     currentUser = newUser;
     res.json({ success: true, message: "Registration successful", user: newUser });
 });
 
 // గెట్ ప్రొఫైల్
-app.get('/api/profile', (req, res) => {
+app.get('/api/profile', function(req, res) {
     res.json({ success: true, data: currentUser });
 });
 
 // అప్‌డేట్ ప్రొఫైల్
-app.post('/api/profile/update', (req, res) => {
-    const { fullName, mobile, city } = req.body;
-    if (fullName) currentUser.fullName = fullName;
-    if (mobile) currentUser.mobile = mobile;
-    if (city) currentUser.city = city;
+app.post('/api/profile/update', function(req, res) {
+    if (req.body.fullName) currentUser.fullName = req.body.fullName;
+    if (req.body.mobile) currentUser.mobile = req.body.mobile;
+    if (req.body.city) currentUser.city = req.body.city;
+    
     res.json({ success: true, message: "Profile updated", data: currentUser });
 });
 
 // యాడ్ కంప్లీట్ (బ్యాలెన్స్ యాడ్)
-app.post('/api/task/complete', (req, res) => {
+app.post('/api/task/complete', function(req, res) {
     currentUser.balance += 1.00;
     res.json({ success: true, newBalance: currentUser.balance });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, function() {
+    console.log("Server is running on port " + PORT);
 });
-referralEarnings:0,
-tasksCompleted:0,
-createdAt:new Date().toISOString()
-};
-
-db.users.push(u);
-saveDB();
-
-req.session.userId=u.id;
-
-res.json({success:true,user:publicUser(u)});
-});
-
-app.post("/api/login",(req,res)=>{
-const email=String(req.body.email||"").trim().toLowerCase();
-const password=String(req.body.password||"");
-
-const u=db.users.find(
-x=>x.email.toLowerCase()===email&&x.password===password
-);
-
-if(!u){
-return res.status(401).json({error:"Invalid email or password."});
-}
-
-req.session.userId=u.id;
-
-res.json({success:true,user:publicUser(u)});
-});
-
-app.post("/api/logout",(req,res)=>{
-req.session.destroy(()=>{
-res.json({success:true});
-});
-});
-
-app.put("/api/profile",requireLogin,(req,res)=>{
-const u=req.user;
-
-if(req.body.name!==undefined)u.name=String(req.body.name).trim();
-if(req.body.mobile!==undefined)u.mobile=String(req.body.mobile).trim();
-if(req.body.city!==undefined)u.city=String(req.body.city).trim();
-if(req.body.upi!==undefined)u.upi=String(req.body.upi).trim();
-
-saveDB();
-
 res.json({success:true,user:publicUser(u)});
 });
 
