@@ -1,115 +1,69 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// మాక్ డేటాబేస్ (డెమో కొరకు)
-let userDB = {
-    email: "rahul.sharma@example.com",
-    fullName: "Rahul Sharma",
-    mobile: "+91 98765 43210",
-    city: "Vizag",
-    balance: 1.00,
-    upiId: "rahul@okaxis"
-};
+// మాక్ డేటాబేస్ (యూజర్స్ & బ్యాలెన్స్)
+let users = [
+    { email: "rahul.sharma@example.com", password: "password123", fullName: "Rahul Sharma", mobile: "+91 98765 43210", city: "Vizag", balance: 1.00, upiId: "rahul@okaxis" }
+];
 
-// 1. గెట్ యూజర్ ప్రొఫైల్
-app.get('/api/profile', (req, res) => {
-    res.json({ success: true, data: userDB });
+let currentUser = users[0]; // డిఫాల్ట్ లాగిన్ యూజర్
+
+// లాగిన్ ఏపీఐ
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+        currentUser = user;
+        res.json({ success: true, message: "Login successful", user });
+    } else {
+        res.status(401).json({ success: false, message: "Invalid email or password" });
+    }
 });
 
-// 2. అప్‌డేట్ ప్రొఫైల్
+// రిజిస్ట్రేషన్ ఏపీఐ
+app.post('/api/register', (req, res) => {
+    const { fullName, email, password, mobile, city } = req.body;
+    if (users.some(u => u.email === email)) {
+        return res.status(400).json({ success: false, message: "Email already registered" });
+    }
+    const newUser = { fullName, email, password, mobile, city, balance: 0.00, upiId: "" };
+    users.push(newUser);
+    currentUser = newUser;
+    res.json({ success: true, message: "Registration successful", user: newUser });
+});
+
+// గెట్ ప్రొఫైల్
+app.get('/api/profile', (req, res) => {
+    res.json({ success: true, data: currentUser });
+});
+
+// అప్‌డేట్ ప్రొఫైల్
 app.post('/api/profile/update', (req, res) => {
     const { fullName, mobile, city } = req.body;
-    if (fullName) userDB.fullName = fullName;
-    if (mobile) userDB.mobile = mobile;
-    if (city) userDB.city = city;
-
-    res.json({ success: true, message: "Profile updated successfully", data: userDB });
+    if (fullName) currentUser.fullName = fullName;
+    if (mobile) currentUser.mobile = mobile;
+    if (city) currentUser.city = city;
+    res.json({ success: true, message: "Profile updated", data: currentUser });
 });
 
-// 3. యాడ్ చూసినప్పుడు బ్యాలెన్స్ యాడ్ చేయడం (Task Completion)
+// యాడ్ కంప్లీట్ (బ్యాలెన్స్ యాడ్)
 app.post('/api/task/complete', (req, res) => {
-    userDB.balance += 1.00;
-    res.json({ success: true, newBalance: userDB.balance, message: "₹1.00 added to your wallet!" });
-});
-
-// 4. విత్‌డ్రాయల్ రిక్వెస్ట్
-app.post('/api/wallet/withdraw', (req, res) => {
-    const { amount, upiId } = req.body;
-    if (amount < 100) {
-        return res.status(400).json({ success: false, message: "Minimum limit is ₹100" });
-    }
-    if (userDB.balance < amount) {
-        return res.status(400).json({ success: false, message: "Insufficient balance" });
-    }
-
-    userDB.balance -= Number(amount);
-    res.json({ success: true, message: `Successfully withdrawn ₹${amount} via Cashfree Payouts`, remainingBalance: userDB.balance });
+    currentUser.balance += 1.00;
+    res.json({ success: true, newBalance: currentUser.balance });
 });
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-next();
-}
-
-function publicUser(u){
-return{
-id:u.id,
-name:u.name,
-email:u.email,
-mobile:u.mobile||"",
-city:u.city||"",
-role:u.role||"Member",
-balance:Number(u.balance||0),
-points:Number(u.points||0),
-referralCode:u.referralCode,
-successfulReferrals:Number(u.successfulReferrals||0),
-referralEarnings:Number(u.referralEarnings||0),
-tasksCompleted:Number(u.tasksCompleted||0),
-upi:u.upi||""
-};
-}
-
-app.get("/api/me",requireLogin,(req,res)=>{
-res.json({user:publicUser(req.user)});
-});
-
-app.post("/api/register",(req,res)=>{
-const name=String(req.body.name||"").trim();
-const email=String(req.body.email||"").trim().toLowerCase();
-const password=String(req.body.password||"");
-const referralCode=String(req.body.referralCode||"").trim();
-
-if(!name||!email||!password){
-return res.status(400).json({error:"Name, email and password are required."});
-}
-
-if(db.users.some(u=>u.email.toLowerCase()===email)){
-return res.status(400).json({error:"Email already registered."});
-}
-
-const referrer=db.users.find(u=>u.referralCode===referralCode);
-
-const u={
-id:crypto.randomUUID(),
-name,
-email,
-password,
-mobile:"",
-city:"",
-role:"Member",
-balance:0,
-points:0,
-referralCode:"AE"+crypto.randomBytes(5).toString("hex").toUpperCase(),
-referredBy:referrer?referrer.id:null,
-successfulReferrals:0,
 referralEarnings:0,
 tasksCompleted:0,
 createdAt:new Date().toISOString()
